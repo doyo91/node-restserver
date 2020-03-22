@@ -1,10 +1,14 @@
 require('./config/config'); // Archivo de configuración se carga primero
 
 const express = require('express');
+const mongoose = require('mongoose');
+const colors = require('colors');
+
+
 const app = express();
 const bodyParser = require('body-parser');
 
-/* Middlewares */
+/* ***** Middlewares ****** */
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -13,51 +17,22 @@ app.use(bodyParser.json());
 
 /* ***************** */
 
-app.get('/usuario', function(req, res) {
-    res.json('get Usuario');
-});
-
-app.post('/usuario', function(req, res) {
-
-    let body = req.body;
-
-    if (body.nombre === undefined) {
-
-        res.status(400).json({
-            ok: false,
-            mensaje: 'El nombre es necesario'
-        });
-
-    } else {
-        res.json({
-            persona: body
-        });
-    }
+// Rutas (controller)
+app.use(require('./controller/usuario.controller'));
 
 
-});
+// Conectar DB
+mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true },
+    (err, res) => {
 
-app.put('/usuario/:id', function(req, res) {
+        if (err) throw err;
 
-    let id = req.params.id;
-
-    res.json({
-        id
+        console.log('Base de datos: ' + 'ONLINE'.green);
     });
-});
-
-app.delete('/usuario/:id', function(req, res) {
-
-    let id = req.params.id;
-
-    res.json({
-        id
-    });
-});
 
 
 
 
 app.listen(process.env.PORT, function() {
-    console.log('Escuchando puerto: ', process.env.PORT);
+    console.log('Escuchando puerto: ', process.env.PORT.yellow);
 });
